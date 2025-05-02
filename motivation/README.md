@@ -26,22 +26,18 @@ A bash script for testing system power configurations under various CPU utilizat
   - `cpupower` utility installed
   - Python 3.x
   - Sudo privileges
-- CPU Load Generator Python script in path:
-  ```bash
-  git clone https://github.com/your-repo/CPULoadGenerator.git
-  ```
 
 ## Installation
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/your-repo/power-test-suite.git
-   cd power-test-suite
+   git clone https://github.com/rexxy-sasori/LoAPE.git
+   cd motivation
    ```
 
 2. Make script executable:
    ```bash
-   chmod +x power_test.sh
+   chmod +x measure-power-sweeping-utilization.sh
    ```
 
 3. Verify uncore path (adjust if needed):
