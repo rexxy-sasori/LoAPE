@@ -1,0 +1,845 @@
+apiVersion: v1
+items:
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "100"
+      cpu-affinity.load-test.io/template: ghz --insecure --call helloworld.Greeter/SayHello
+        -r {{.Rate}} -z 60s {{.URL}}
+      kubectl.kubernetes.io/last-applied-configuration: '{"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"name":"aes-nodejs-tracing","namespace":"default"},"spec":{"template":{"metadata":{},"spec":{"containers":[{"args":["--addr=0.0.0.0:50000","--function-endpoint-url=0.0.0.0","--function-endpoint-port=50051","--function-name=aes-nodejs"],"env":[{"name":"ENABLE_TRACING","value":"true"}],"image":"intel-112:5000/docker.io/vhiveease/relay:latest","name":"","ports":[{"containerPort":50000,"name":"h2c"}]},{"args":["--addr=0.0.0.0","--port=50051","--zipkin=http://zipkin:9411/api/v2/spans"],"env":[{"name":"ENABLE_TRACING","value":"true"}],"image":"intel-112:5000/docker.io/vhiveease/aes-nodejs:latest","name":"","resources":{}}]}}}}'
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-04-03T09:21:05Z"
+    generation: 20
+    name: aes-nodejs-tracing
+    namespace: default
+    resourceVersion: "162901306"
+    uid: 6a271c06-d966-4b1c-8e06-368857f0f43b
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/metric: rps
+          autoscaling.knative.dev/target: "100"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 999
+        containers:
+        - args:
+          - --addr=0.0.0.0:50000
+          - --function-endpoint-url=0.0.0.0
+          - --function-endpoint-port=50051
+          - --function-name=aes-nodejs
+          env:
+          - name: ENABLE_TRACING
+            value: "true"
+          image: intel-112:5000/docker.io/vhiveease/relay:latest
+          name: user-container-0
+          ports:
+          - containerPort: 50000
+            name: h2c
+            protocol: TCP
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 256Mi
+        - args:
+          - --addr=0.0.0.0
+          - --port=50051
+          - --zipkin=http://zipkin:9411/api/v2/spans
+          env:
+          - name: ENABLE_TRACING
+            value: "true"
+          image: intel-112:5000/docker.io/vhiveease/aes-nodejs:latest
+          name: user-container-1
+          resources:
+            limits:
+              memory: 256Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 300
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://aes-nodejs-tracing.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:38:58Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:38:58Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:38:58Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: aes-nodejs-tracing-00020
+    latestReadyRevisionName: aes-nodejs-tracing-00020
+    observedGeneration: 20
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: aes-nodejs-tracing-00020
+    url: http://aes-nodejs-tracing.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "10"
+      cpu-affinity.load-test.io/template: ghz --insecure --call helloworld.Greeter/SayHello
+        -r {{.Rate}} -z 60s {{.URL}}
+      cpu-affinity.mycontroller.io/slo-target-ms: "80"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{"cpu-affinity.load-test.io/rps":"1000","cpu-affinity.load-test.io/template":"ghz --insecure --call helloworld.Greeter/SayHello -r {{.Rate}} -z 45s {{.URL}}","cpu-affinity.mycontroller.io/slo-target-ms":"80","serving.knative.dev/creator":"system:admin","serving.knative.dev/lastModifier":"system:admin"},"creationTimestamp":"2025-01-28T03:18:18Z","generation":6,"name":"compression-python","namespace":"default","resourceVersion":"71985760","uid":"9ff0ee6d-a2d4-4cca-96ab-ccb86b38fed4"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/metric":"rps","autoscaling.knative.dev/target":"200"},"creationTimestamp":null},"spec":{"containerConcurrency":999,"containers":[{"args":["--addr=0.0.0.0:50000","--function-endpoint-url=0.0.0.0","--function-endpoint-port=50051","--function-name=compression-python","--value=metamorphosis.txt"],"image":"intel-112:5000/docker.io/vhiveease/relay:latest","imagePullPolicy":"IfNotPresent","name":"user-container-0","ports":[{"containerPort":50000,"name":"h2c","protocol":"TCP"}],"readinessProbe":{"successThreshold":1,"tcpSocket":{"port":0}},"resources":{"limits":{"memory":"128Mi"}}},{"args":["--addr=0.0.0.0","--port=50051","--db_addr=mongodb://compression-database:27017"],"image":"intel-112:5000/docker.io/vhiveease/compression-python:latest","imagePullPolicy":"IfNotPresent","name":"user-container-1","resources":{"limits":{"memory":"128Mi"}}}],"enableServiceLinks":false,"nodeSelector":{"benchmark":"yes"},"timeoutSeconds":300}},"traffic":[{"latestRevision":true,"percent":100}]},"status":{"address":{"url":"http://compression-python.default.svc.cluster.local"},"conditions":[{"lastTransitionTime":"2025-02-06T14:41:43Z","status":"True","type":"ConfigurationsReady"},{"lastTransitionTime":"2025-02-06T14:41:44Z","status":"True","type":"Ready"},{"lastTransitionTime":"2025-02-06T14:41:44Z","status":"True","type":"RoutesReady"}],"latestCreatedRevisionName":"compression-python-00006","latestReadyRevisionName":"compression-python-00006","observedGeneration":6,"traffic":[{"latestRevision":true,"percent":100,"revisionName":"compression-python-00006"}],"url":"http://compression-python.default.172.16.13.92.sslip.io"}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-09T06:51:41Z"
+    generation: 20
+    name: compression-python
+    namespace: default
+    resourceVersion: "162901381"
+    uid: e6a9f5f1-858c-4236-bd39-9d78d5801226
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/metric: rps
+          autoscaling.knative.dev/target: "200"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 999
+        containers:
+        - args:
+          - --addr=0.0.0.0:50000
+          - --function-endpoint-url=0.0.0.0
+          - --function-endpoint-port=50051
+          - --function-name=compression-python
+          - --value=metamorphosis.txt
+          image: intel-112:5000/docker.io/vhiveease/relay:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-0
+          ports:
+          - containerPort: 50000
+            name: h2c
+            protocol: TCP
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 128Mi
+        - args:
+          - --addr=0.0.0.0
+          - --port=50051
+          - --db_addr=mongodb://compression-database:27017
+          image: intel-112:5000/docker.io/vhiveease/compression-python:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-1
+          resources:
+            limits:
+              memory: 128Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://compression-python.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:38:59Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:38:59Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:38:59Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: compression-python-00020
+    latestReadyRevisionName: compression-python-00020
+    observedGeneration: 20
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: compression-python-00020
+    url: http://compression-python.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "1200"
+      cpu-affinity.load-test.io/template: ghz --insecure --call helloworld.Greeter/SayHello
+        -r {{.Rate}} -z 60s {{.URL}}
+      cpu-affinity.mycontroller.io/slo-target-ms: "8"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{"cpu-affinity.load-test.io/rps":"1000","cpu-affinity.load-test.io/template":"ghz --insecure --call helloworld.Greeter/SayHello -r {{.Rate}} -z 45s {{.URL}}","cpu-affinity.mycontroller.io/slo-target-ms":"8","serving.knative.dev/creator":"system:admin","serving.knative.dev/lastModifier":"system:admin"},"creationTimestamp":"2025-01-28T03:18:18Z","generation":7,"name":"fibonacci-go-tracing","namespace":"default","resourceVersion":"71985783","uid":"fe82efa0-88ad-4d49-8891-327eff97b91d"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/metric":"rps","autoscaling.knative.dev/target":"750"},"creationTimestamp":null},"spec":{"containerConcurrency":999,"containers":[{"args":["--addr=0.0.0.0:50000","--function-endpoint-url=0.0.0.0","--function-endpoint-port=50051","--function-name=fibonacci-go","--value=10","--generator=linear","--lowerBound=1","--upperBound=10"],"env":[{"name":"ENABLE_TRACING","value":"false"}],"image":"intel-112:5000/docker.io/vhiveease/relay:latest","imagePullPolicy":"IfNotPresent","name":"user-container-0","ports":[{"containerPort":50000,"name":"h2c","protocol":"TCP"}],"readinessProbe":{"successThreshold":1,"tcpSocket":{"port":0}},"resources":{"limits":{"memory":"768Mi"}}},{"args":["--addr=0.0.0.0:50051","--zipkin=http://zipkin:9411/api/v2/spans"],"env":[{"name":"ENABLE_TRACING","value":"false"}],"image":"intel-112:5000/docker.io/vhiveease/fibonacci-go:latest","imagePullPolicy":"IfNotPresent","name":"user-container-1","resources":{"limits":{"memory":"768Mi"}}}],"enableServiceLinks":false,"nodeSelector":{"benchmark":"yes"},"timeoutSeconds":300}},"traffic":[{"latestRevision":true,"percent":100}]},"status":{"address":{"url":"http://fibonacci-go-tracing.default.svc.cluster.local"},"conditions":[{"lastTransitionTime":"2025-02-06T14:41:43Z","status":"True","type":"ConfigurationsReady"},{"lastTransitionTime":"2025-02-06T14:41:45Z","status":"True","type":"Ready"},{"lastTransitionTime":"2025-02-06T14:41:45Z","status":"True","type":"RoutesReady"}],"latestCreatedRevisionName":"fibonacci-go-tracing-00007","latestReadyRevisionName":"fibonacci-go-tracing-00007","observedGeneration":7,"traffic":[{"latestRevision":true,"percent":100,"revisionName":"fibonacci-go-tracing-00007"}],"url":"http://fibonacci-go-tracing.default.172.16.13.92.sslip.io"}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-09T06:51:41Z"
+    generation: 24
+    name: fibonacci-go-tracing
+    namespace: default
+    resourceVersion: "162901526"
+    uid: 95bf01f3-3826-47aa-a37b-a12e15e9f607
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/metric: rps
+          autoscaling.knative.dev/target: "750"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 999
+        containers:
+        - args:
+          - --addr=0.0.0.0:50000
+          - --function-endpoint-url=0.0.0.0
+          - --function-endpoint-port=50051
+          - --function-name=fibonacci-go
+          - --value=10
+          - --generator=linear
+          - --lowerBound=1
+          - --upperBound=10
+          env:
+          - name: ENABLE_TRACING
+            value: "false"
+          image: intel-112:5000/docker.io/vhiveease/relay:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-0
+          ports:
+          - containerPort: 50000
+            name: h2c
+            protocol: TCP
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 128Mi
+        - args:
+          - --addr=0.0.0.0:50051
+          - --zipkin=http://zipkin:9411/api/v2/spans
+          env:
+          - name: ENABLE_TRACING
+            value: "false"
+          image: intel-112:5000/docker.io/vhiveease/fibonacci-go:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-1
+          resources:
+            limits:
+              memory: 768Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://fibonacci-go-tracing.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: fibonacci-go-tracing-00024
+    latestReadyRevisionName: fibonacci-go-tracing-00024
+    observedGeneration: 24
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: fibonacci-go-tracing-00024
+    url: http://fibonacci-go-tracing.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "100"
+      cpu-affinity.load-test.io/template: k6 run --vus {{.Rate}} --rps {{.Rate}} --duration
+        60s data/dynamic-html.js
+      cpu-affinity.mycontroller.io/slo-target-ms: "4000"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{},"name":"quarkus-dynamic-html","namespace":"default"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/panic-window-percentage":"2","autoscaling.knative.dev/target":"50","autoscaling.knative.dev/target-utilization-percentage":"75"}},"spec":{"containers":[{"image":"intel-112:5000/dynamic-html:jvm","resources":{"limits":{"memory":"512Mi"}}}],"nodeSelector":{"benchmark":"yes"}}}}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-10T14:13:20Z"
+    generation: 19
+    name: quarkus-dynamic-html
+    namespace: default
+    resourceVersion: "162901440"
+    uid: 18a3aca8-598f-46a2-8ec7-a51a290fdc36
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/panic-window-percentage: "2"
+          autoscaling.knative.dev/target-utilization-percentage: "75"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 100
+        containers:
+        - image: intel-112:5000/dynamic-html:jvm
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 512Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://quarkus-dynamic-html.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:38:59Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: quarkus-dynamic-html-00019
+    latestReadyRevisionName: quarkus-dynamic-html-00019
+    observedGeneration: 19
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: quarkus-dynamic-html-00019
+    url: http://quarkus-dynamic-html.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "100"
+      cpu-affinity.load-test.io/template: k6 run --vus {{.Rate}} --rps {{.Rate}} --duration
+        60s data/graph-bfs.js
+      cpu-affinity.mycontroller.io/slo-target-ms: "4000"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{},"name":"quarkus-graph-bfs","namespace":"default"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/panic-window-percentage":"2","autoscaling.knative.dev/target":"50","autoscaling.knative.dev/target-utilization-percentage":"75"}},"spec":{"containers":[{"image":"intel-112:5000/graph-bfs:jvm","resources":{"limits":{"memory":"512Mi"}}}],"nodeSelector":{"benchmark":"yes"}}}}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-10T14:13:35Z"
+    generation: 19
+    name: quarkus-graph-bfs
+    namespace: default
+    resourceVersion: "162901461"
+    uid: 2f165bfe-8ae9-42a5-a602-1a667cd39fbe
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/panic-window-percentage: "2"
+          autoscaling.knative.dev/target-utilization-percentage: "75"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 100
+        containers:
+        - image: intel-112:5000/graph-bfs:jvm
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 512Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://quarkus-graph-bfs.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:38:59Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: quarkus-graph-bfs-00019
+    latestReadyRevisionName: quarkus-graph-bfs-00019
+    observedGeneration: 19
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: quarkus-graph-bfs-00019
+    url: http://quarkus-graph-bfs.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "100"
+      cpu-affinity.load-test.io/template: k6 run --vus {{.Rate}} --rps {{.Rate}} --duration
+        60s data/graph-mst.js
+      cpu-affinity.mycontroller.io/slo-target-ms: "4000"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{},"name":"quarkus-graph-mst","namespace":"default"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/panic-window-percentage":"2","autoscaling.knative.dev/target":"50","autoscaling.knative.dev/target-utilization-percentage":"75"}},"spec":{"containers":[{"image":"intel-112:5000/graph-mst:jvm","resources":{"limits":{"memory":"512Mi"}}}],"nodeSelector":{"benchmark":"yes"}}}}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-10T14:13:54Z"
+    generation: 19
+    name: quarkus-graph-mst
+    namespace: default
+    resourceVersion: "162901487"
+    uid: e2516ae6-1b21-44ec-834a-89d76ecb7ec9
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/panic-window-percentage: "2"
+          autoscaling.knative.dev/target-utilization-percentage: "75"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 100
+        containers:
+        - image: intel-112:5000/graph-mst:jvm
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 512Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://quarkus-graph-mst.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: quarkus-graph-mst-00019
+    latestReadyRevisionName: quarkus-graph-mst-00019
+    observedGeneration: 19
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: quarkus-graph-mst-00019
+    url: http://quarkus-graph-mst.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "100"
+      cpu-affinity.load-test.io/template: k6 run --vus {{.Rate}} --rps {{.Rate}} --duration
+        60s data/graph-pagerank.js
+      cpu-affinity.mycontroller.io/slo-target-ms: "4000"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{},"name":"quarkus-graph-pagerank","namespace":"default"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/panic-window-percentage":"2","autoscaling.knative.dev/target":"50","autoscaling.knative.dev/target-utilization-percentage":"75"}},"spec":{"containers":[{"image":"intel-112:5000/graph-pagerank:jvm","resources":{"limits":{"memory":"512Mi"}}}],"nodeSelector":{"benchmark":"yes"}}}}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-10T14:14:10Z"
+    generation: 19
+    name: quarkus-graph-pagerank
+    namespace: default
+    resourceVersion: "162901508"
+    uid: 547848b9-f315-4558-8c6e-c264a99da9bd
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/panic-window-percentage: "2"
+          autoscaling.knative.dev/target-utilization-percentage: "75"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 100
+        containers:
+        - image: intel-112:5000/graph-pagerank:jvm
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 512Mi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://quarkus-graph-pagerank.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: quarkus-graph-pagerank-00019
+    latestReadyRevisionName: quarkus-graph-pagerank-00019
+    observedGeneration: 19
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: quarkus-graph-pagerank-00019
+    url: http://quarkus-graph-pagerank.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "4"
+      cpu-affinity.load-test.io/template: ghz --insecure --call helloworld.Greeter/SayHello
+        -r {{.Rate}} -z 60s {{.URL}}
+      cpu-affinity.mycontroller.io/slo-target-ms: "180"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{"cpu-affinity.load-test.io/rps":"50","cpu-affinity.load-test.io/template":"ghz --insecure --call helloworld.Greeter/SayHello -r {{.Rate}} -z 45s {{.URL}}","cpu-affinity.mycontroller.io/slo-target-ms":"80","serving.knative.dev/creator":"system:admin","serving.knative.dev/lastModifier":"system:admin"},"creationTimestamp":"2025-01-28T03:18:19Z","generation":7,"name":"rnn-serving-python","namespace":"default","resourceVersion":"71648950","uid":"dd08ee23-b4f1-45f0-91ca-cabd5815764c"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/metric":"rps","autoscaling.knative.dev/minScale":"1","autoscaling.knative.dev/target":"10"},"creationTimestamp":null},"spec":{"containerConcurrency":999,"containers":[{"args":["--addr=0.0.0.0:50000","--function-endpoint-url=0.0.0.0","--function-endpoint-port=50051","--function-name=rnn-serving-python","--value=French","--generator=random","--lowerBound=10","--upperBound=20"],"image":"intel-112:5000/docker.io/vhiveease/relay:latest","imagePullPolicy":"IfNotPresent","name":"user-container-0","ports":[{"containerPort":50000,"name":"h2c","protocol":"TCP"}],"readinessProbe":{"successThreshold":1,"tcpSocket":{"port":0}},"resources":{"limits":{"memory":"1Gi"}}},{"args":["--addr=0.0.0.0","--port=50051","--default_language=French","--num_strings=15"],"image":"intel-112:5000/docker.io/vhiveease/rnn-serving-python:latest","imagePullPolicy":"IfNotPresent","name":"user-container-1","resources":{"limits":{"memory":"2Gi"}}}],"enableServiceLinks":false,"nodeSelector":{"benchmark":"yes"},"timeoutSeconds":300}},"traffic":[{"latestRevision":true,"percent":100}]},"status":{"address":{"url":"http://rnn-serving-python.default.svc.cluster.local"},"conditions":[{"lastTransitionTime":"2025-02-03T11:07:49Z","status":"True","type":"ConfigurationsReady"},{"lastTransitionTime":"2025-02-03T11:07:49Z","status":"True","type":"Ready"},{"lastTransitionTime":"2025-02-03T11:07:49Z","status":"True","type":"RoutesReady"}],"latestCreatedRevisionName":"rnn-serving-python-00007","latestReadyRevisionName":"rnn-serving-python-00007","observedGeneration":7,"traffic":[{"latestRevision":true,"percent":100,"revisionName":"rnn-serving-python-00007"}],"url":"http://rnn-serving-python.default.172.16.13.92.sslip.io"}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-09T06:51:41Z"
+    generation: 19
+    name: rnn-serving-python
+    namespace: default
+    resourceVersion: "162901571"
+    uid: 1140c6af-d35a-4a06-9dea-3494e142c97c
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/metric: rps
+          autoscaling.knative.dev/target: "10"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 999
+        containers:
+        - args:
+          - --addr=0.0.0.0:50000
+          - --function-endpoint-url=0.0.0.0
+          - --function-endpoint-port=50051
+          - --function-name=rnn-serving-python
+          - --value=French
+          - --generator=random
+          - --lowerBound=10
+          - --upperBound=20
+          image: intel-112:5000/docker.io/vhiveease/relay:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-0
+          ports:
+          - containerPort: 50000
+            name: h2c
+            protocol: TCP
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 1Gi
+        - args:
+          - --addr=0.0.0.0
+          - --port=50051
+          - --default_language=French
+          - --num_strings=15
+          image: intel-112:5000/docker.io/vhiveease/rnn-serving-python:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-1
+          resources:
+            limits:
+              memory: 2Gi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://rnn-serving-python.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:39:00Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:01Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:01Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: rnn-serving-python-00019
+    latestReadyRevisionName: rnn-serving-python-00019
+    observedGeneration: 19
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: rnn-serving-python-00019
+    url: http://rnn-serving-python.default.172.16.13.92.sslip.io
+- apiVersion: serving.knative.dev/v1
+  kind: Service
+  metadata:
+    annotations:
+      cpu-affinity.load-test.io/rps: "4"
+      cpu-affinity.load-test.io/template: ghz --insecure --call helloworld.Greeter/SayHello
+        -r {{.Rate}} -z 60s {{.URL}}
+      cpu-affinity.mycontroller.io/slo-target-ms: "180"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{"cpu-affinity.load-test.io/rps":"50","cpu-affinity.load-test.io/template":"ghz --insecure --call helloworld.Greeter/SayHello -r {{.Rate}} -z 45s {{.URL}}","cpu-affinity.mycontroller.io/slo-target-ms":"180","serving.knative.dev/creator":"system:admin","serving.knative.dev/lastModifier":"system:admin"},"creationTimestamp":"2025-01-28T03:18:19Z","generation":6,"name":"video-processing-python","namespace":"default","resourceVersion":"71648995","uid":"7d91d65f-a271-4d8e-8bca-26d5f093b3c8"},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/metric":"rps","autoscaling.knative.dev/minScale":"1","autoscaling.knative.dev/target":"10"},"creationTimestamp":null},"spec":{"containerConcurrency":999,"containers":[{"args":["--addr=0.0.0.0:50000","--function-endpoint-url=0.0.0.0","--function-endpoint-port=50051","--function-name=video-processing-python","--value=video3.mp4"],"image":"intel-112:5000/docker.io/vhiveease/relay:latest","imagePullPolicy":"IfNotPresent","name":"user-container-0","ports":[{"containerPort":50000,"name":"h2c","protocol":"TCP"}],"readinessProbe":{"successThreshold":1,"tcpSocket":{"port":0}},"resources":{"limits":{"memory":"1Gi"}}},{"args":["--addr=0.0.0.0","--port=50051","--db_addr=mongodb://video-processing-database:27017","--default_video=default.mp4","--num_frames=10"],"image":"intel-112:5000/docker.io/vhiveease/video-processing-python:latest","imagePullPolicy":"IfNotPresent","name":"user-container-1","resources":{"limits":{"memory":"2Gi"}}}],"enableServiceLinks":false,"nodeSelector":{"benchmark":"yes"},"timeoutSeconds":300}},"traffic":[{"latestRevision":true,"percent":100}]},"status":{"address":{"url":"http://video-processing-python.default.svc.cluster.local"},"conditions":[{"lastTransitionTime":"2025-02-04T04:26:33Z","status":"True","type":"ConfigurationsReady"},{"lastTransitionTime":"2025-02-04T04:26:34Z","status":"True","type":"Ready"},{"lastTransitionTime":"2025-02-04T04:26:34Z","status":"True","type":"RoutesReady"}],"latestCreatedRevisionName":"video-processing-python-00006","latestReadyRevisionName":"video-processing-python-00006","observedGeneration":6,"traffic":[{"latestRevision":true,"percent":100,"revisionName":"video-processing-python-00006"}],"url":"http://video-processing-python.default.172.16.13.92.sslip.io"}}
+      serving.knative.dev/creator: system:admin
+      serving.knative.dev/lastModifier: system:admin
+    creationTimestamp: "2025-02-09T06:51:41Z"
+    generation: 17
+    name: video-processing-python
+    namespace: default
+    resourceVersion: "162901604"
+    uid: 4e974eb9-d041-4477-aa64-d544b5a45ff3
+  spec:
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/metric: rps
+          autoscaling.knative.dev/target: "10"
+        creationTimestamp: null
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: empty
+                  operator: NotIn
+                  values:
+                  - "true"
+              weight: 100
+        containerConcurrency: 999
+        containers:
+        - args:
+          - --addr=0.0.0.0:50000
+          - --function-endpoint-url=0.0.0.0
+          - --function-endpoint-port=50051
+          - --function-name=video-processing-python
+          - --value=video3.mp4
+          image: intel-112:5000/docker.io/vhiveease/relay:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-0
+          ports:
+          - containerPort: 50000
+            name: h2c
+            protocol: TCP
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+          resources:
+            limits:
+              memory: 1Gi
+        - args:
+          - --addr=0.0.0.0
+          - --port=50051
+          - --db_addr=mongodb://video-processing-database:27017
+          - --default_video=default.mp4
+          - --num_frames=10
+          image: intel-112:5000/docker.io/vhiveease/video-processing-python:latest
+          imagePullPolicy: IfNotPresent
+          name: user-container-1
+          resources:
+            limits:
+              memory: 2Gi
+        enableServiceLinks: false
+        nodeSelector:
+          node_type: fusion
+        timeoutSeconds: 90
+        tolerations:
+        - effect: NoSchedule
+          key: empty
+          operator: Equal
+          value: "true"
+    traffic:
+    - latestRevision: true
+      percent: 100
+  status:
+    address:
+      url: http://video-processing-python.default.svc.cluster.local
+    conditions:
+    - lastTransitionTime: "2025-04-07T05:39:01Z"
+      status: "True"
+      type: ConfigurationsReady
+    - lastTransitionTime: "2025-04-07T05:39:01Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2025-04-07T05:39:01Z"
+      status: "True"
+      type: RoutesReady
+    latestCreatedRevisionName: video-processing-python-00017
+    latestReadyRevisionName: video-processing-python-00017
+    observedGeneration: 17
+    traffic:
+    - latestRevision: true
+      percent: 100
+      revisionName: video-processing-python-00017
+    url: http://video-processing-python.default.172.16.13.92.sslip.io
+kind: List
+metadata:
+  resourceVersion: ""
