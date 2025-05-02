@@ -1,0 +1,18 @@
+FROM python
+FROM centos
+
+RUN pip install redis -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install matplotlib -i  https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install psutil -i  https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install twisted -i  https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install click -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN yum update
+RUN yum install cpufrequtils
+
+RUN git clone https://github.com/SheepHuan/CPULoadGenerator.git --branch Python3
+
+COPY ./worker.py /worker.py 
+COPY ./rediswq.py /rediswq.py
+
+CMD  python worker.py
+
