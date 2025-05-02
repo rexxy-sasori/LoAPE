@@ -1,5 +1,3 @@
-Here's the revised implementation with user-configurable node preservation and updated documentation:
-
 ```markdown
 # Kubernetes Node Scheduling Control Scripts
 
