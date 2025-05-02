@@ -1,5 +1,3 @@
-Here's a comprehensive README.md for running the energy consumption analysis:
-
 ```markdown
 # Energy Consumption Analysis Toolkit
 
@@ -128,14 +126,3 @@ python analysis/plot-server-power.py \
 ---
 
 **Note**: The analysis calculates energy consumption by integrating power measurements over time (∫P(t)dt) using Riemann sum approximation.
-``` 
-
-This README provides:
-1. Clear setup and configuration instructions
-2. End-to-end usage examples
-3. Troubleshooting guidance
-4. Security considerations
-5. Documentation references
-6. Explanation of analysis methodology
-
-The markdown structure ensures compatibility with GitHub/GitLab documentation rendering while maintaining readability in plain text editors.
